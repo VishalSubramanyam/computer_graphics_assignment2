@@ -10,7 +10,7 @@
 #include "lighting.h"
 #include "input_handlers.h"
 
-constexpr uint64_t mapLength = 50;
+constexpr int64_t mapLength = 50;
 
 // Global variables to store the accumulated rotation angle based on mouse movement
 float rotateMouseX = 0.0f;
@@ -19,6 +19,7 @@ int prevMouseX = 0;
 int prevMouseY = 0;
 float fbDistance = 0;
 
+// generates the required buildings, buildings = vector<Building> (refer generate_landscape.h/cpp)
 auto buildings = generate_landscape(mapLength);
 
 void display() {
@@ -29,31 +30,25 @@ void display() {
 
     // create a plane
     int const CORNER = static_cast<int>((l + 3) / 2);
-    int TOP_LEFT[] = {-CORNER, 0, CORNER};
-    int TOP_RIGHT[] = {CORNER, 0, CORNER};
-    int BOTTOM_LEFT[] = {-CORNER, 0, -CORNER};
-    int BOTTOM_RIGHT[] = {CORNER, 0, -CORNER};
-    constexpr GLdouble const PLANE_COLOR[] = {0.5, 0.5, 0.5};
-
 
     setupLighting();
-    glTranslatef(0, 0, fbDistance);
 
-    gluLookAt(-CORNER - 10, CORNER, CORNER + 10, 0, 0, 0, 0, 1, 0);
-    // Apply accumulated mouse rotation angles
+
+    double eye_x, eye_y, eye_z;
+    eye_x = -CORNER - 10;
+    eye_y = CORNER;
+    eye_z = CORNER+10;
+    glTranslatef(0, 0, fbDistance);
+    // place the camera at a certain CORNER
     glRotatef(rotateMouseX, 1.0f, 0.0f, 0.0f); // apply mouse rotation about x axis
     glRotatef(rotateMouseY, 0.0f, 1.0f, 0.0f); // apply mouse rotation about y axis
+    gluLookAt(eye_x, eye_y, eye_z, 0, 0, 0, 0, 1, 0);
+    // Apply accumulated mouse rotation angles
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-    glBegin(GL_QUADS);
-    glColor3dv(PLANE_COLOR);
-    glNormal3f(0.0f, 1.0f, 0.0f); // need to define the normal vector for this plane, so that lighting works
-    glVertex3iv(TOP_LEFT);
-    glVertex3iv(TOP_RIGHT);
-    glVertex3iv(BOTTOM_RIGHT);
-    glVertex3iv(BOTTOM_LEFT);
-    glEnd();
+    // for every possible building, draw a cuboid at the building's coordinates
+
     for(auto const &building : buildings) {
-        drawCuboid(building.x, 0, building.z, building.height);
+        drawCuboid(building.x, 0, building.z, building.height, building.color);
     }
 
     glutSwapBuffers();
@@ -89,7 +84,6 @@ int main(int argc, char **argv) {
     glutMouseFunc(mouse); // detecting mouse clicks
     glutMotionFunc(mouseMotion); // for dragging the mouse with left button
     glutKeyboardFunc(keyboard_handler); // handles ASCII keycodes
-    buildings = generate_landscape(mapLength);
     glutMainLoop();
     return 0;
 }

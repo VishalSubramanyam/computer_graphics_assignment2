@@ -5,6 +5,11 @@
 */
 
 // Code for managing lighting
+/**
+ * Name: Vishal Subramanyam
+ * Roll Number: 20CS10081
+ * Email addr: vishalsubramanyam02@gmail.com
+*/
 
 #include "lighting.h"
 #include <GL/glut.h>

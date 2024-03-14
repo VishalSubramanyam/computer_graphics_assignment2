@@ -34,8 +34,8 @@ void mouseMotion(int x, int y) {
     int deltaY = y - prevMouseY;
 
     // Update the accumulated rotation angles based on mouse movement
-    rotateMouseY += deltaX;
-    rotateMouseX += deltaY;
+    rotateMouseY += 0.2 * deltaX;
+    rotateMouseX += 0.2 * deltaY;
 
     // Remember the current mouse position for the next callback
     prevMouseX = x;
